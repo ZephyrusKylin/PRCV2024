@@ -154,6 +154,7 @@ def get_img_norm_cfg(dataset_name, dataset_dir):
             std_list.append(img.std())
         img_norm_cfg = dict(mean=float(np.array(mean_list).mean()), std=float(np.array(std_list).mean()))
         print(float(np.array(mean_list).mean()),float(np.array(std_list).mean()))
+    img_norm_cfg = dict(mean=43.988800048828125, std=20.728660583496094)
     return img_norm_cfg
 
 def get_optimizer(net, optimizer_name, scheduler_name, optimizer_settings, scheduler_settings):
