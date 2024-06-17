@@ -144,7 +144,7 @@ def get_img_norm_cfg(dataset_name, dataset_dir):
         #     test_list = f.read().splitlines()
         # img_list = train_list + test_list
         img_list = train_list
-        img_dir = dataset_dir + '/' + dataset_name + '/img/'
+        img_dir = dataset_dir + '/' + dataset_name + '/images/'
         mean_list = []
         std_list = []
         for img_pth in img_list:
