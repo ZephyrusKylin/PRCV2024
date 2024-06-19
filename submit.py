@@ -85,7 +85,7 @@ def test():
                 #     _img=(pred[0,0,:,:]>opt.threshold[2]).float().cpu()
                 # else:
                 #     _img=(pred[0,0,:,:]>opt.threshold[1]).float().cpu()
-                _img=(pred[0,0,:,:]>opt.threshold[1]).float().cpu()
+                _img=(pred[0,0,:,:]>opt.threshold[2]).float().cpu()
                 img_save = transforms.ToPILImage()(_img)
                 img_save.save(opt.save_img_dir + img_dir[0] + '.png')  
 
