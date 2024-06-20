@@ -143,16 +143,3 @@ class augumentation(object):
             input = input.transpose(1, 0)
             target = target.transpose(1, 0)
         return input, target
-
-# class augumentation3D(object):
-#     def __call__(self, input, target):
-#         if random.random()<0.5:
-#             input = input[:, ::-1, :]
-#             target = target[:, ::-1, :]
-#         if random.random()<0.5:
-#             input = input[:, :, ::-1]
-#             target = target[:, :, ::-1]
-#         # if random.random()<0.5:
-#         #     input = input.transpose(-1, -2)
-#         #     target = target.transpose(-1, -2)
-#         return input, target
