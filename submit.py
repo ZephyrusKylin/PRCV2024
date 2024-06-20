@@ -26,7 +26,7 @@ parser.add_argument("--img_norm_cfg", default=None, type=dict,
 parser.add_argument("--save_img", default=True, type=bool, help="save image of or not")
 parser.add_argument("--save_img_dir", type=str, default='./inference/mask/', help="path of saved image")
 parser.add_argument("--save_log", type=str, default='./log_seed_posSample/', help="path of saved .pth")
-parser.add_argument("--threshold", type=list, default=[0.1,0.75,0.95])
+parser.add_argument("--threshold", type=list, default=[0.1,0.5,0.95])
 parser.add_argument("--batchSize", type=int, default=1, help="Training batch sizse")
 
 global opt
@@ -57,27 +57,30 @@ def test():
             img = Variable(img).cuda()
             pred=img
             _,_,h,w=img.shape
-            pred1=Variable(pred).cuda()
-            pred2=Variable(pred).cuda()
-            pred3=Variable(pred).cuda()
-            index0=torch.ones(pred.shape).cuda()
-            for i in range(0, h, 512):
-                for j in range(0,w,512):
-                    sub_img=img[:,:,i:i+512,j:j+512]
-                    if opt.model_name == 'mix':
-                        if size[0] > 2048 or size[1] > 2048:
-                            sub_pred1=torch.zeros(sub_img.shape).cuda()
-                        else:
+            pred1=torch.zeros(img.shape).cuda()
+            pred2=torch.zeros(img.shape).cuda()
+            pred3=torch.zeros(img.shape).cuda()
+            if size[0] > 1536 or size[1] > 1536:
+                pred=torch.zeros(img.shape).cuda()
+            else:
+                for i in range(0, h, 512):
+                    for j in range(0,w,512):
+                        sub_img=img[:,:,i:i+512,j:j+512]
+                        if opt.model_name == 'mix':                            
                             sub_pred1=net1.forward(sub_img)
-                        sub_pred2=net2.forward(sub_img)
-                        sub_pred3=net3.forward(sub_img)
-                        pred[:,:,i:i+512,j:j+512]=torch.max(torch.max(sub_pred1,sub_pred2),sub_pred3)
-                        # pred1[:,:,i:i+512,j:j+512]=sub_pred1
-                        # pred2[:,:,i:i+512,j:j+512]=sub_pred2
-                        # pred3[:,:,i:i+512,j:j+512]=sub_pred3
-                    else:
-                        sub_pred=net.forward(sub_img)
-                        pred[:,:,i:i+512,j:j+512]=sub_pred
+                            sub_pred2=net2.forward(sub_img)
+                            sub_pred3=net3.forward(sub_img)
+                            pred1[:,:,i:i+512,j:j+512]=sub_pred1
+                            pred2[:,:,i:i+512,j:j+512]=sub_pred2
+                            pred3[:,:,i:i+512,j:j+512]=sub_pred3
+                        else:
+                            sub_pred=net.forward(sub_img)
+                            pred[:,:,i:i+512,j:j+512]=sub_pred
+            if opt.model_name=='mix':
+                pred1=(pred1>opt.threshold[1]).float()
+                pred2=(pred2>opt.threshold[1]).float()
+                pred3=(pred3>opt.threshold[1]).float()
+                pred=((pred1+pred2+pred3)>1).float()
             pred = pred[:,:,:size[0],:size[1]] 
             ### save img
             if opt.save_img == True:
@@ -85,7 +88,7 @@ def test():
                 #     _img=(pred[0,0,:,:]>opt.threshold[2]).float().cpu()
                 # else:
                 #     _img=(pred[0,0,:,:]>opt.threshold[1]).float().cpu()
-                _img=(pred[0,0,:,:]>opt.threshold[2]).float().cpu()
+                _img=(pred[0,0,:,:]>opt.threshold[1]).float().cpu()
                 img_save = transforms.ToPILImage()(_img)
                 img_save.save(opt.save_img_dir + img_dir[0] + '.png')  
 
